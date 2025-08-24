@@ -1,0 +1,394 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block page_title %}Analytics Dashboard{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.home') }}">Home</a></li>
+<li class="breadcrumb-item active">Dashboard</li>
+{% endblock %}
+
+{% block content %}
+<!-- Main Dashboard Content -->
+<div class="row">
+  
+  <!-- Total Analyses Card -->
+  <div class="col-lg-3 col-6">
+    <div class="small-box text-bg-primary">
+      <div class="inner">
+        <h3>{{ dashboard_data.total_analyses or 0 }}</h3>
+        <p>Total Analyses</p>
+      </div>
+      <div class="small-box-icon">
+        <i class="bi bi-bar-chart"></i>
+      </div>
+      <a href="{{ url_for('dashboard.new_analysis') }}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+        Create New Analysis <i class="bi bi-link-45deg"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Platform Distribution -->
+  <div class="col-lg-3 col-6">
+    <div class="small-box text-bg-success">
+      <div class="inner">
+        <h3>{{ dashboard_data.platform_data.keys() | length or 0 }}</h3>
+        <p>Active Platforms</p>
+      </div>
+      <div class="small-box-icon">
+        <i class="bi bi-diagram-3"></i>
+      </div>
+      <a href="{{ url_for('dashboard.settings') }}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+        Manage Platforms <i class="bi bi-link-45deg"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Sentiment Overview -->
+  <div class="col-lg-3 col-6">
+    <div class="small-box text-bg-warning">
+      <div class="inner">
+        {% set latest_analysis = dashboard_data.recent_analyses[0] if dashboard_data.recent_analyses else None %}
+        {% if latest_analysis %}
+          {% set sentiment_data = latest_analysis.sentiment_scores | from_json %}
+          {% set sentiment = sentiment_data.sentiment_analysis.sentiment if sentiment_data.sentiment_analysis else 'neutral' %}
+          <h3 class="sentiment-{{ sentiment }}">{{ sentiment.title() }}</h3>
+          <p>Latest Sentiment</p>
+        {% else %}
+          <h3>-</h3>
+          <p>No Data Yet</p>
+        {% endif %}
+      </div>
+      <div class="small-box-icon">
+        <i class="bi bi-emoji-smile"></i>
+      </div>
+      <a href="#" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+        View Details <i class="bi bi-link-45deg"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Quality Score -->
+  <div class="col-lg-3 col-6">
+    <div class="small-box text-bg-info">
+      <div class="inner">
+        {% if latest_analysis and sentiment_data.comprehensive_analysis %}
+          {% set quality = sentiment_data.comprehensive_analysis.content_quality.quality_score * 100 %}
+          <h3>{{ "%.0f"|format(quality) }}%</h3>
+          <p>Content Quality</p>
+        {% else %}
+          <h3>-</h3>
+          <p>No Data Yet</p>
+        {% endif %}
+      </div>
+      <div class="small-box-icon">
+        <i class="bi bi-award"></i>
+      </div>
+      <a href="#" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+        Quality Report <i class="bi bi-link-45deg"></i>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Enhanced Analytics Row -->
+<div class="row">
+  
+  <!-- Platform Analytics Chart -->
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-pie-chart me-1"></i>
+          Platform Distribution
+        </h3>
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
+            <i class="bi bi-dash"></i>
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="platformChart" style="height: 300px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sentiment Trends Chart -->
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-graph-up me-1"></i>
+          Sentiment Trends
+        </h3>
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
+            <i class="bi bi-dash"></i>
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="sentimentChart" style="height: 300px;"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Recent Analyses and Recommendations -->
+<div class="row">
+  
+  <!-- Recent Analyses -->
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-clock-history me-1"></i>
+          Recent Analyses
+        </h3>
+        <div class="card-tools">
+          <a href="{{ url_for('dashboard.new_analysis') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus"></i> New Analysis
+          </a>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        {% if dashboard_data.recent_analyses %}
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Platform</th>
+                  <th>Target</th>
+                  <th>Sentiment</th>
+                  <th>Quality</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for analysis in dashboard_data.recent_analyses[:10] %}
+                  {% set sentiment_data = analysis.sentiment_scores | from_json %}
+                  {% set sentiment = sentiment_data.sentiment_analysis.sentiment if sentiment_data.sentiment_analysis else 'neutral' %}
+                  {% set quality = sentiment_data.comprehensive_analysis.content_quality.quality_score * 100 if sentiment_data.comprehensive_analysis else 0 %}
+                  <tr>
+                    <td>
+                      <span class="badge bg-secondary">{{ analysis.platform.title() }}</span>
+                    </td>
+                    <td>{{ analysis.target_identifier[:30] }}{% if analysis.target_identifier|length > 30 %}...{% endif %}</td>
+                    <td>
+                      <span class="badge bg-{{ 'success' if sentiment == 'positive' else 'danger' if sentiment == 'negative' else 'warning' }}">
+                        {{ sentiment.title() }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="progress" style="height: 20px;">
+                        <div class="progress-bar bg-{{ 'success' if quality > 70 else 'warning' if quality > 40 else 'danger' }}" 
+                             role="progressbar" style="width: {{ quality }}%" 
+                             aria-valuenow="{{ quality }}" aria-valuemin="0" aria-valuemax="100">
+                          {{ "%.0f"|format(quality) }}%
+                        </div>
+                      </div>
+                    </td>
+                    <td>{{ analysis.date_created.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                      <a href="{{ url_for('dashboard.view_analysis', analysis_id=analysis.id) }}" 
+                         class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i>
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-4">
+            <i class="bi bi-graph-up" style="font-size: 3rem; color: #dee2e6;"></i>
+            <h5 class="mt-2 text-muted">No analyses yet</h5>
+            <p class="text-muted">Start by creating your first analysis</p>
+            <a href="{{ url_for('dashboard.new_analysis') }}" class="btn btn-primary">
+              <i class="bi bi-plus"></i> Create Analysis
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Actionable Recommendations -->
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-lightbulb me-1"></i>
+          Recommendations
+        </h3>
+      </div>
+      <div class="card-body">
+        {% if latest_analysis and sentiment_data.comprehensive_analysis and sentiment_data.comprehensive_analysis.actionable_recommendations %}
+          {% for recommendation in sentiment_data.comprehensive_analysis.actionable_recommendations[:5] %}
+            <div class="card recommendation-card priority-{{ recommendation.priority or 'medium' }} mb-2">
+              <div class="card-body p-2">
+                <h6 class="card-title mb-1">
+                  <span class="badge bg-{{ 'danger' if recommendation.priority == 'high' else 'warning' if recommendation.priority == 'medium' else 'success' }}">
+                    {{ recommendation.priority or 'medium' }}
+                  </span>
+                  {{ recommendation.category or 'General' }}
+                </h6>
+                <p class="card-text small mb-1">{{ recommendation.action }}</p>
+                {% if recommendation.description %}
+                  <small class="text-muted">{{ recommendation.description }}</small>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center">
+            <i class="bi bi-lightbulb" style="font-size: 2rem; color: #dee2e6;"></i>
+            <p class="text-muted mt-2">No recommendations available</p>
+            <small class="text-muted">Create an analysis to get actionable insights</small>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card mt-3">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-lightning me-1"></i>
+          Quick Actions
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <a href="{{ url_for('dashboard.new_analysis') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> New Analysis
+          </a>
+          <a href="{{ url_for('dashboard.settings') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-gear"></i> Configure APIs
+          </a>
+          <button type="button" class="btn btn-outline-info" onclick="testLLMConnection()">
+            <i class="bi bi-cpu"></i> Test LLM
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+  // Platform Distribution Chart
+  const platformData = {{ dashboard_data.platform_data | tojson }};
+  
+  if (Object.keys(platformData).length > 0) {
+    const platformLabels = Object.keys(platformData);
+    const platformCounts = Object.values(platformData);
+    
+    const platformChartData = [{
+      values: platformCounts,
+      labels: platformLabels,
+      type: 'pie',
+      hole: 0.4,
+      marker: {
+        colors: ['#007bff', '#28a745', '#fd7e14', '#dc3545', '#6f42c1']
+      }
+    }];
+    
+    const platformLayout = {
+      showlegend: true,
+      height: 300,
+      margin: { t: 0, b: 0, l: 0, r: 0 },
+      font: { size: 12 }
+    };
+    
+    Plotly.newPlot('platformChart', platformChartData, platformLayout, {responsive: true});
+  } else {
+    document.getElementById('platformChart').innerHTML = '<div class="text-center text-muted mt-5"><i class="bi bi-pie-chart" style="font-size: 3rem;"></i><p>No platform data available</p></div>';
+  }
+
+  // Sentiment Trends Chart (Sample)
+  const sentimentTrendData = [{
+    x: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+    y: [0.7, 0.8, 0.6, 0.9],
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: 'Positive',
+    line: { color: '#28a745' }
+  }, {
+    x: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+    y: [0.2, 0.1, 0.3, 0.05],
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: 'Negative',
+    line: { color: '#dc3545' }
+  }];
+  
+  const sentimentLayout = {
+    showlegend: true,
+    height: 300,
+    margin: { t: 20, b: 40, l: 40, r: 20 },
+    xaxis: { title: 'Time Period' },
+    yaxis: { title: 'Sentiment Score' }
+  };
+  
+  Plotly.newPlot('sentimentChart', sentimentTrendData, sentimentLayout, {responsive: true});
+
+  // Test LLM Connection
+  function testLLMConnection() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="bi bi-hourglass-split"></i> Testing...';
+    button.disabled = true;
+    
+    fetch('{{ url_for("dashboard.test_llm_connection") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token() }}'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        button.innerHTML = '<i class="bi bi-check-circle"></i> Connected';
+        button.className = 'btn btn-success';
+        setTimeout(() => {
+          button.innerHTML = originalText;
+          button.className = 'btn btn-outline-info';
+          button.disabled = false;
+        }, 2000);
+      } else {
+        button.innerHTML = '<i class="bi bi-x-circle"></i> Failed';
+        button.className = 'btn btn-danger';
+        setTimeout(() => {
+          button.innerHTML = originalText;
+          button.className = 'btn btn-outline-info';
+          button.disabled = false;
+        }, 2000);
+      }
+    })
+    .catch(error => {
+      button.innerHTML = '<i class="bi bi-x-circle"></i> Error';
+      button.className = 'btn btn-danger';
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.className = 'btn btn-outline-info';
+        button.disabled = false;
+      }, 2000);
+    });
+  }
+
+  // Auto-refresh dashboard every 30 seconds
+  setInterval(() => {
+    location.reload();
+  }, 30000);
+</script>
+{% endblock %}

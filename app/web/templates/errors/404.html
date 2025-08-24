@@ -1,0 +1,51 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block page_title %}404 - Page Not Found{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Home</a></li>
+<li class="breadcrumb-item active">404 Error</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="error-page">
+      <h2 class="headline text-warning display-1 text-center">404</h2>
+      
+      <div class="error-content text-center">
+        <h3><i class="bi bi-exclamation-triangle text-warning"></i> Oops! Page not found.</h3>
+        
+        <p class="lead">
+          We could not find the page you were looking for.
+          Meanwhile, you may <a href="{{ url_for('dashboard.home') if current_user.is_authenticated else url_for('main.home') }}">return to dashboard</a> or try using the search form.
+        </p>
+        
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard.home') }}" class="btn btn-primary me-md-2">
+                  <i class="bi bi-house"></i> Go to Dashboard
+                </a>
+                <a href="{{ url_for('dashboard.new_analysis') }}" class="btn btn-outline-primary">
+                  <i class="bi bi-plus-circle"></i> New Analysis
+                </a>
+              {% else %}
+                <a href="{{ url_for('main.home') }}" class="btn btn-primary me-md-2">
+                  <i class="bi bi-house"></i> Go Home
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary">
+                  <i class="bi bi-box-arrow-in-right"></i> Login
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

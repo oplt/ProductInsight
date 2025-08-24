@@ -1,0 +1,54 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Internal Server Error{% endblock %}
+
+{% block page_title %}500 - Internal Server Error{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Home</a></li>
+<li class="breadcrumb-item active">500 Error</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="error-page">
+      <h2 class="headline text-danger display-1 text-center">500</h2>
+      
+      <div class="error-content text-center">
+        <h3><i class="bi bi-exclamation-triangle text-danger"></i> Oops! Something went wrong.</h3>
+        
+        <p class="lead">
+          We are experiencing some technical difficulties. Our team has been notified and is working on fixing this issue.
+        </p>
+        
+        <p class="text-muted">
+          Please try again in a few moments. If the problem persists, please contact support.
+        </p>
+        
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard.home') }}" class="btn btn-primary me-md-2">
+                  <i class="bi bi-house"></i> Go to Dashboard
+                </a>
+                <button type="button" class="btn btn-outline-primary" onclick="location.reload()">
+                  <i class="bi bi-arrow-clockwise"></i> Try Again
+                </button>
+              {% else %}
+                <a href="{{ url_for('main.home') }}" class="btn btn-primary me-md-2">
+                  <i class="bi bi-house"></i> Go Home
+                </a>
+                <button type="button" class="btn btn-outline-primary" onclick="location.reload()">
+                  <i class="bi bi-arrow-clockwise"></i> Try Again
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

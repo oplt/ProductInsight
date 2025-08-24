@@ -1,0 +1,248 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}New Analysis{% endblock %}
+
+{% block page_title %}Create New Analysis{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.home') }}">Home</a></li>
+<li class="breadcrumb-item active">New Analysis</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-plus-circle me-1"></i>
+          Create Content Analysis
+        </h3>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('dashboard.new_analysis') }}">
+          {{ form.hidden_tag() }}
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.platform.label(class="form-label") }}
+                {% if form.platform.errors %}
+                  {{ form.platform(class="form-control is-invalid") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.platform.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  {{ form.platform(class="form-control") }}
+                {% endif %}
+                <div class="form-text">Choose the platform you want to analyze</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.target_identifier.label(class="form-label") }}
+                {% if form.target_identifier.errors %}
+                  {{ form.target_identifier(class="form-control is-invalid", placeholder="e.g., @username, product ASIN, #hashtag") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.target_identifier.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  {{ form.target_identifier(class="form-control", placeholder="e.g., @username, product ASIN, #hashtag") }}
+                {% endif %}
+                <div class="form-text" id="targetHelp">Enter the specific target for analysis</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-12">
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_for('dashboard.home') }}" class="btn btn-outline-secondary me-md-2">Cancel</a>
+                {{ form.submit(class="btn btn-primary") }}
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-info-circle me-1"></i>
+          Platform Guidelines
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="accordion" id="platformAccordion">
+          
+          <!-- Amazon Guidelines -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="amazonHeading">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                      data-bs-target="#amazonCollapse" aria-expanded="true" aria-controls="amazonCollapse">
+                <i class="bi bi-shop me-2"></i> Amazon Reviews
+              </button>
+            </h2>
+            <div id="amazonCollapse" class="accordion-collapse collapse show" aria-labelledby="amazonHeading" 
+                 data-bs-parent="#platformAccordion">
+              <div class="accordion-body">
+                <p class="small mb-2"><strong>Target Format:</strong> Amazon ASIN</p>
+                <p class="small mb-2"><strong>Example:</strong> B08N5WRWNW</p>
+                <p class="small mb-0">Enter the 10-character Amazon product identifier found in the product URL.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Twitter Guidelines -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="twitterHeading">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                      data-bs-target="#twitterCollapse" aria-expanded="false" aria-controls="twitterCollapse">
+                <i class="bi bi-twitter me-2"></i> Twitter Analysis
+              </button>
+            </h2>
+            <div id="twitterCollapse" class="accordion-collapse collapse" aria-labelledby="twitterHeading" 
+                 data-bs-parent="#platformAccordion">
+              <div class="accordion-body">
+                <p class="small mb-2"><strong>Username:</strong> @username</p>
+                <p class="small mb-2"><strong>Search Query:</strong> keyword or phrase</p>
+                <p class="small mb-2"><strong>Examples:</strong> @tesla, artificial intelligence</p>
+                <p class="small mb-0">Use @ for specific accounts or enter keywords for search analysis.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instagram Guidelines -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="instagramHeading">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                      data-bs-target="#instagramCollapse" aria-expanded="false" aria-controls="instagramCollapse">
+                <i class="bi bi-instagram me-2"></i> Instagram Analysis
+              </button>
+            </h2>
+            <div id="instagramCollapse" class="accordion-collapse collapse" aria-labelledby="instagramHeading" 
+                 data-bs-parent="#platformAccordion">
+              <div class="accordion-body">
+                <p class="small mb-2"><strong>Username:</strong> @username</p>
+                <p class="small mb-2"><strong>Hashtag:</strong> #hashtag</p>
+                <p class="small mb-2"><strong>Examples:</strong> @instagram, #photography</p>
+                <p class="small mb-0">Analyze specific accounts or hashtag trends.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- TikTok Guidelines -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="tiktokHeading">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                      data-bs-target="#tiktokCollapse" aria-expanded="false" aria-controls="tiktokCollapse">
+                <i class="bi bi-tiktok me-2"></i> TikTok Analysis
+              </button>
+            </h2>
+            <div id="tiktokCollapse" class="accordion-collapse collapse" aria-labelledby="tiktokHeading" 
+                 data-bs-parent="#platformAccordion">
+              <div class="accordion-body">
+                <p class="small mb-2"><strong>Username:</strong> @username</p>
+                <p class="small mb-2"><strong>Search Query:</strong> keyword or trend</p>
+                <p class="small mb-2"><strong>Examples:</strong> @tiktok, dance challenge</p>
+                <p class="small mb-0">Analyze user content or trending topics.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Analysis Features -->
+    <div class="card mt-3">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-star me-1"></i>
+          Analysis Features
+        </h3>
+      </div>
+      <div class="card-body">
+        <ul class="list-unstyled small">
+          <li class="mb-2">
+            <i class="bi bi-check-circle text-success me-2"></i>
+            <strong>Multi-dimensional Sentiment Analysis</strong>
+            <div class="text-muted">Beyond basic positive/negative with confidence scores</div>
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-check-circle text-success me-2"></i>
+            <strong>Emotion Detection</strong>
+            <div class="text-muted">Joy, anger, fear, surprise, sadness, trust analysis</div>
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-check-circle text-success me-2"></i>
+            <strong>Intent Classification</strong>
+            <div class="text-muted">Purchase intent, complaints, feature requests</div>
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-check-circle text-success me-2"></i>
+            <strong>Business Intelligence</strong>
+            <div class="text-muted">Actionable recommendations with priority ranking</div>
+          </li>
+          <li class="mb-0">
+            <i class="bi bi-check-circle text-success me-2"></i>
+            <strong>Interactive Visualizations</strong>
+            <div class="text-muted">Charts, graphs, and trend analysis</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+  // Update help text based on selected platform
+  document.addEventListener('DOMContentLoaded', function() {
+    const platformSelect = document.querySelector('select[name="platform"]');
+    const targetHelp = document.getElementById('targetHelp');
+    const targetInput = document.querySelector('input[name="target_identifier"]');
+    
+    function updateHelp() {
+      const platform = platformSelect.value;
+      let helpText = 'Enter the specific target for analysis';
+      let placeholder = 'e.g., @username, product ASIN, #hashtag';
+      
+      switch(platform) {
+        case 'amazon':
+          helpText = 'Enter the Amazon ASIN (10-character product identifier)';
+          placeholder = 'e.g., B08N5WRWNW';
+          break;
+        case 'twitter':
+          helpText = 'Enter @username for user analysis or keywords for search';
+          placeholder = 'e.g., @tesla or "artificial intelligence"';
+          break;
+        case 'instagram':
+          helpText = 'Enter @username for user posts or #hashtag for trending content';
+          placeholder = 'e.g., @instagram or #photography';
+          break;
+        case 'tiktok':
+          helpText = 'Enter @username for user videos or keywords for search';
+          placeholder = 'e.g., @tiktok or "dance challenge"';
+          break;
+      }
+      
+      targetHelp.textContent = helpText;
+      targetInput.placeholder = placeholder;
+    }
+    
+    if (platformSelect) {
+      platformSelect.addEventListener('change', updateHelp);
+      updateHelp(); // Set initial help text
+    }
+  });
+</script>
+{% endblock %}

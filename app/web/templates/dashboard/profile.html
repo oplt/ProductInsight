@@ -1,0 +1,126 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block page_title %}User Profile{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.home') }}">Home</a></li>
+<li class="breadcrumb-item active">Profile</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-person me-1"></i>
+          Update Profile Information
+        </h3>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('dashboard.profile') }}" enctype="multipart/form-data">
+          {{ form.hidden_tag() }}
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.username.label(class="form-label") }}
+                {% if form.username.errors %}
+                  {{ form.username(class="form-control is-invalid") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.username.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  {{ form.username(class="form-control") }}
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.email.label(class="form-label") }}
+                {% if form.email.errors %}
+                  {{ form.email(class="form-control is-invalid") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  {{ form.email(class="form-control") }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <div class="form-group">
+                {{ form.picture.label(class="form-label") }}
+                {{ form.picture(class="form-control", accept="image/*") }}
+                {% if form.picture.errors %}
+                  <div class="text-danger">
+                    {% for error in form.picture.errors %}
+                      <small>{{ error }}</small>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-12">
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_for('dashboard.home') }}" class="btn btn-outline-secondary me-md-2">Cancel</a>
+                {{ form.submit(class="btn btn-primary") }}
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-image me-1"></i>
+          Current Profile Picture
+        </h3>
+      </div>
+      <div class="card-body text-center">
+        <img src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}" 
+             class="rounded-circle mb-3" alt="Profile Picture" 
+             style="width: 150px; height: 150px; object-fit: cover;">
+        <p class="text-muted">Upload a new image to change your profile picture</p>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-info-circle me-1"></i>
+          Account Information
+        </h3>
+      </div>
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-sm-5">Username:</dt>
+          <dd class="col-sm-7">{{ current_user.username }}</dd>
+          
+          <dt class="col-sm-5">Email:</dt>
+          <dd class="col-sm-7">{{ current_user.email }}</dd>
+          
+          <dt class="col-sm-5">Member Since:</dt>
+          <dd class="col-sm-7">{{ current_user.date_created.strftime('%B %d, %Y') if current_user.date_created else 'Unknown' }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

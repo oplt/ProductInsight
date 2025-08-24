@@ -1,0 +1,83 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block auth_content %}
+<div class="card card-outline card-primary">
+  <div class="card-header text-center">
+    <h1 class="mb-0"><b>Product</b>Insights</h1>
+    <p class="mt-2 text-muted">Comprehensive Content Analysis Platform</p>
+  </div>
+  <div class="card-body">
+    <div class="text-center mb-4">
+      <i class="bi bi-graph-up-arrow" style="font-size: 4rem; color: #007bff;"></i>
+    </div>
+    
+    <h4 class="text-center mb-3">Analyze Content Across Platforms</h4>
+    
+    <div class="row text-center mb-4">
+      <div class="col-6 col-md-3 mb-2">
+        <i class="bi bi-shop" style="font-size: 2rem; color: #fd7e14;"></i>
+        <p class="small mt-1">Amazon<br>Reviews</p>
+      </div>
+      <div class="col-6 col-md-3 mb-2">
+        <i class="bi bi-twitter" style="font-size: 2rem; color: #1da1f2;"></i>
+        <p class="small mt-1">Twitter<br>Analysis</p>
+      </div>
+      <div class="col-6 col-md-3 mb-2">
+        <i class="bi bi-instagram" style="font-size: 2rem; color: #e4405f;"></i>
+        <p class="small mt-1">Instagram<br>Insights</p>
+      </div>
+      <div class="col-6 col-md-3 mb-2">
+        <i class="bi bi-tiktok" style="font-size: 2rem; color: #000;"></i>
+        <p class="small mt-1">TikTok<br>Analytics</p>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <h6 class="mb-2">✨ Advanced Features:</h6>
+      <ul class="list-unstyled small">
+        <li><i class="bi bi-check-circle text-success me-2"></i>Multi-dimensional sentiment analysis</li>
+        <li><i class="bi bi-check-circle text-success me-2"></i>Emotion detection and tracking</li>
+        <li><i class="bi bi-check-circle text-success me-2"></i>Intent classification and insights</li>
+        <li><i class="bi bi-check-circle text-success me-2"></i>Actionable business recommendations</li>
+        <li><i class="bi bi-check-circle text-success me-2"></i>Real-time analytics dashboard</li>
+      </ul>
+    </div>
+
+    <div class="d-grid gap-2">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+        <i class="bi bi-person-plus me-2"></i>Get Started - Sign Up
+      </a>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Already have an account? Sign In
+      </a>
+    </div>
+
+    <div class="text-center mt-4">
+      <small class="text-muted">
+        Powered by AI • Enterprise-grade Analytics • Secure & Private
+      </small>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+  // Add some subtle animations
+  document.addEventListener('DOMContentLoaded', function() {
+    // Animate platform icons on hover
+    const platformIcons = document.querySelectorAll('.col-6 i, .col-md-3 i');
+    platformIcons.forEach(icon => {
+      icon.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.2)';
+        this.style.transition = 'transform 0.2s ease';
+      });
+      icon.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+      });
+    });
+  });
+</script>
+{% endblock %}

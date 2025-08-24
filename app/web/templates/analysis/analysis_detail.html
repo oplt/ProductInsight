@@ -1,0 +1,336 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Analysis Details{% endblock %}
+
+{% block page_title %}Analysis Details{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.home') }}">Home</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.platform_analysis', platform=analysis.platform) }}">{{ analysis.platform.title() }}</a></li>
+<li class="breadcrumb-item active">Analysis Details</li>
+{% endblock %}
+
+{% block content %}
+{% set sentiment_data = analysis.sentiment_scores | from_json %}
+{% set basic_sentiment = sentiment_data.sentiment_analysis if sentiment_data.sentiment_analysis else {} %}
+{% set comprehensive = sentiment_data.comprehensive_analysis if sentiment_data.comprehensive_analysis else {} %}
+
+<!-- Analysis Header -->
+<div class="row mb-3">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h4 class="mb-1">{{ analysis.target_identifier }}</h4>
+            <p class="text-muted mb-2">
+              <span class="badge bg-secondary me-2">{{ analysis.platform.title() }}</span>
+              <span class="badge bg-info me-2">{{ analysis.analysis_type.replace('_', ' ').title() }}</span>
+              <small>Created: {{ analysis.date_created.strftime('%Y-%m-%d %H:%M') }}</small>
+            </p>
+          </div>
+          <div class="col-md-4 text-end">
+            <span class="badge bg-{{ 'success' if analysis.status == 'completed' else 'warning' if analysis.status == 'pending' else 'danger' }} fs-6">
+              {{ analysis.status.title() }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Key Metrics Row -->
+<div class="row mb-3">
+  <div class="col-md-3">
+    <div class="info-box">
+      <span class="info-box-icon bg-{{ 'success' if basic_sentiment.sentiment == 'positive' else 'danger' if basic_sentiment.sentiment == 'negative' else 'warning' }}">
+        <i class="bi bi-emoji-{{ 'smile' if basic_sentiment.sentiment == 'positive' else 'frown' if basic_sentiment.sentiment == 'negative' else 'neutral' }}"></i>
+      </span>
+      <div class="info-box-content">
+        <span class="info-box-text">Overall Sentiment</span>
+        <span class="info-box-number">{{ basic_sentiment.sentiment.title() if basic_sentiment.sentiment else 'Unknown' }}</span>
+        {% if basic_sentiment.confidence %}
+          <div class="progress mt-1">
+            <div class="progress-bar" style="width: {{ basic_sentiment.confidence * 100 }}%"></div>
+          </div>
+          <span class="progress-description">{{ "%.0f"|format(basic_sentiment.confidence * 100) }}% confidence</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="info-box">
+      <span class="info-box-icon bg-info"><i class="bi bi-star"></i></span>
+      <div class="info-box-content">
+        <span class="info-box-text">Content Quality</span>
+        {% set quality = comprehensive.content_quality.quality_score * 100 if comprehensive.content_quality else 0 %}
+        <span class="info-box-number">{{ "%.0f"|format(quality) }}%</span>
+        <div class="progress mt-1">
+          <div class="progress-bar bg-{{ 'success' if quality > 70 else 'warning' if quality > 40 else 'danger' }}" 
+               style="width: {{ quality }}%"></div>
+        </div>
+        <span class="progress-description">Quality Score</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="info-box">
+      <span class="info-box-icon bg-purple"><i class="bi bi-brain"></i></span>
+      <div class="info-box-content">
+        <span class="info-box-text">Primary Intent</span>
+        <span class="info-box-number">
+          {{ comprehensive.intent_analysis.primary_intent.replace('_', ' ').title() if comprehensive.intent_analysis else 'Unknown' }}
+        </span>
+        {% if comprehensive.intent_analysis and comprehensive.intent_analysis.intent_confidence %}
+          <div class="progress mt-1">
+            <div class="progress-bar" style="width: {{ comprehensive.intent_analysis.intent_confidence * 100 }}%"></div>
+          </div>
+          <span class="progress-description">{{ "%.0f"|format(comprehensive.intent_analysis.intent_confidence * 100) }}% confidence</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="info-box">
+      <span class="info-box-icon bg-success"><i class="bi bi-lightbulb"></i></span>
+      <div class="info-box-content">
+        <span class="info-box-text">Recommendations</span>
+        <span class="info-box-number">
+          {{ comprehensive.actionable_recommendations | length if comprehensive.actionable_recommendations else 0 }}
+        </span>
+        <span class="progress-description">Action Items</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Content Analysis Results -->
+<div class="row">
+  
+  <!-- Main Analysis Results -->
+  <div class="col-md-8">
+    
+    <!-- Executive Summary -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-file-text me-1"></i>
+          Executive Summary
+        </h3>
+      </div>
+      <div class="card-body">
+        {% if comprehensive.executive_summary %}
+          <div class="analysis-summary">
+            {{ comprehensive.executive_summary | replace('\n', '<br>') | safe }}
+          </div>
+        {% else %}
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            {{ analysis.analysis_result if analysis.analysis_result else 'Analysis result not available.' }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Enhanced LLM Insights -->
+    {% if comprehensive.llm_enhanced_insights %}
+    <div class="card mb-3">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-cpu me-1"></i>
+          AI-Enhanced Business Insights
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="llm-insights">
+          {{ comprehensive.llm_enhanced_insights | replace('\n', '<br>') | safe }}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- Charts -->
+    {% if charts %}
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-graph-up me-1"></i>
+          Data Visualizations
+        </h3>
+      </div>
+      <div class="card-body">
+        <div id="analysisCharts" style="height: 400px;"></div>
+      </div>
+    </div>
+    {% endif %}
+    
+  </div>
+  
+  <!-- Sidebar with Additional Insights -->
+  <div class="col-md-4">
+    
+    <!-- Emotion Analysis -->
+    {% if comprehensive.emotion_analysis %}
+    <div class="card mb-3">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-emoji-smile me-1"></i>
+          Emotion Analysis
+        </h3>
+      </div>
+      <div class="card-body">
+        {% if comprehensive.emotion_analysis.dominant_emotions %}
+          {% for emotion in comprehensive.emotion_analysis.dominant_emotions[:5] %}
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="emotion-badge">{{ emotion.title() }}</span>
+              <span class="badge bg-primary">
+                {{ "%.0f"|format(comprehensive.emotion_analysis.emotion_distribution[emotion] * 100) }}%
+              </span>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-muted">No emotion data available</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- Actionable Recommendations -->
+    {% if comprehensive.actionable_recommendations %}
+    <div class="card mb-3">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-lightbulb me-1"></i>
+          Recommendations
+        </h3>
+      </div>
+      <div class="card-body">
+        {% for recommendation in comprehensive.actionable_recommendations[:5] %}
+          <div class="card recommendation-card priority-{{ recommendation.priority or 'medium' }} mb-2">
+            <div class="card-body p-2">
+              <h6 class="card-title mb-1">
+                <span class="badge bg-{{ 'danger' if recommendation.priority == 'high' else 'warning' if recommendation.priority == 'medium' else 'success' }}">
+                  {{ recommendation.priority or 'medium' }}
+                </span>
+                {{ recommendation.category or 'General' }}
+              </h6>
+              <p class="card-text small mb-1">{{ recommendation.action }}</p>
+              {% if recommendation.description %}
+                <small class="text-muted">{{ recommendation.description }}</small>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- Business Insights -->
+    {% if comprehensive.business_insights %}
+    <div class="card mb-3">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-briefcase me-1"></i>
+          Business Insights
+        </h3>
+      </div>
+      <div class="card-body">
+        {% if comprehensive.business_insights.key_opportunities %}
+          <h6>Key Opportunities</h6>
+          <ul class="list-unstyled small">
+            {% for opportunity in comprehensive.business_insights.key_opportunities[:3] %}
+              <li class="mb-1"><i class="bi bi-arrow-up-circle text-success me-1"></i> {{ opportunity }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        
+        {% if comprehensive.business_insights.risk_areas %}
+          <h6 class="mt-3">Risk Areas</h6>
+          <ul class="list-unstyled small">
+            {% for risk in comprehensive.business_insights.risk_areas[:3] %}
+              <li class="mb-1"><i class="bi bi-exclamation-triangle text-warning me-1"></i> {{ risk }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- Analysis Metadata -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-info-circle me-1"></i>
+          Analysis Details
+        </h3>
+      </div>
+      <div class="card-body">
+        <dl class="row small">
+          <dt class="col-sm-5">Platform:</dt>
+          <dd class="col-sm-7">{{ analysis.platform.title() }}</dd>
+          
+          <dt class="col-sm-5">Target:</dt>
+          <dd class="col-sm-7">{{ analysis.target_identifier }}</dd>
+          
+          <dt class="col-sm-5">Type:</dt>
+          <dd class="col-sm-7">{{ analysis.analysis_type.replace('_', ' ').title() }}</dd>
+          
+          <dt class="col-sm-5">Status:</dt>
+          <dd class="col-sm-7">
+            <span class="badge bg-{{ 'success' if analysis.status == 'completed' else 'warning' if analysis.status == 'pending' else 'danger' }}">
+              {{ analysis.status.title() }}
+            </span>
+          </dd>
+          
+          <dt class="col-sm-5">Created:</dt>
+          <dd class="col-sm-7">{{ analysis.date_created.strftime('%Y-%m-%d %H:%M') }}</dd>
+          
+          {% if comprehensive.content_quality %}
+          <dt class="col-sm-5">Data Points:</dt>
+          <dd class="col-sm-7">
+            {% set raw_data = analysis.raw_data | from_json %}
+            {{ raw_data | length if raw_data else 0 }} items
+          </dd>
+          {% endif %}
+        </dl>
+        
+        <div class="mt-3">
+          <a href="{{ url_for('dashboard.platform_analysis', platform=analysis.platform) }}" 
+             class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back to {{ analysis.platform.title() }}
+          </a>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+  // Load charts if available
+  {% if charts %}
+  const chartData = {{ charts | tojson }};
+  
+  // Create visualization based on available chart data
+  if (chartData && Object.keys(chartData).length > 0) {
+    // Implementation would depend on the specific chart data structure
+    console.log('Chart data available:', chartData);
+    
+    // For now, show a simple placeholder
+    document.getElementById('analysisCharts').innerHTML = `
+      <div class="text-center text-muted">
+        <i class="bi bi-graph-up" style="font-size: 3rem;"></i>
+        <p class="mt-2">Interactive charts coming soon</p>
+        <p class="small">Chart data: ${Object.keys(chartData).join(', ')}</p>
+      </div>
+    `;
+  }
+  {% endif %}
+</script>
+{% endblock %}

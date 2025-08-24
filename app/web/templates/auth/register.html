@@ -1,0 +1,154 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block auth_content %}
+<div class="card card-outline card-primary">
+  <div class="card-header text-center">
+    <a href="{{ url_for('main.home') }}" class="link-dark text-center link-offset-2 link-opacity-100 link-opacity-50-hover">
+      <h1 class="mb-0"><b>Product</b>Insights</h1>
+    </a>
+  </div>
+  <div class="card-body">
+    <p class="login-box-msg">Register to start analyzing content across platforms</p>
+    
+    <form method="POST" action="{{ url_for('auth.register') }}">
+      {{ form.hidden_tag() }}
+      
+      <!-- Username Field -->
+      <div class="input-group mb-3">
+        {% if form.username.errors %}
+          {{ form.username(class="form-control is-invalid", placeholder="Username") }}
+          <div class="invalid-feedback">
+            {% for error in form.username.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.username(class="form-control", placeholder="Username") }}
+        {% endif %}
+        <div class="input-group-text">
+          <span class="bi bi-person-fill"></span>
+        </div>
+      </div>
+      
+      <!-- Email Field -->
+      <div class="input-group mb-3">
+        {% if form.email.errors %}
+          {{ form.email(class="form-control is-invalid", placeholder="Email") }}
+          <div class="invalid-feedback">
+            {% for error in form.email.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.email(class="form-control", placeholder="Email") }}
+        {% endif %}
+        <div class="input-group-text">
+          <span class="bi bi-envelope"></span>
+        </div>
+      </div>
+      
+      <!-- Password Field -->
+      <div class="input-group mb-3">
+        {% if form.password.errors %}
+          {{ form.password(class="form-control is-invalid", placeholder="Password") }}
+          <div class="invalid-feedback">
+            {% for error in form.password.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.password(class="form-control", placeholder="Password") }}
+        {% endif %}
+        <div class="input-group-text">
+          <span class="bi bi-lock-fill"></span>
+        </div>
+      </div>
+      
+      <!-- Confirm Password Field -->
+      <div class="input-group mb-3">
+        {% if form.confirm_password.errors %}
+          {{ form.confirm_password(class="form-control is-invalid", placeholder="Confirm Password") }}
+          <div class="invalid-feedback">
+            {% for error in form.confirm_password.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.confirm_password(class="form-control", placeholder="Confirm Password") }}
+        {% endif %}
+        <div class="input-group-text">
+          <span class="bi bi-lock-fill"></span>
+        </div>
+      </div>
+      
+      <!-- Terms Agreement -->
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="agreeTerms" required>
+            <label class="form-check-label" for="agreeTerms">
+              I agree to the <a href="#" class="text-primary">terms of service</a> and <a href="#" class="text-primary">privacy policy</a>
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Submit Button -->
+      <div class="row">
+        <div class="col-12">
+          <div class="d-grid gap-2">
+            {{ form.submit(class="btn btn-primary btn-block") }}
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Social Registration Placeholder -->
+    <div class="social-auth-links text-center mt-2 mb-3">
+      <a href="#" class="btn btn-block btn-outline-danger">
+        <i class="bi bi-google me-2"></i> Sign up with Google
+      </a>
+    </div>
+
+    <p class="mb-0 text-center">
+      <a href="{{ url_for('auth.login') }}">
+        Already have an account? Sign in here
+      </a>
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+  // Auto-focus on first form field
+  document.addEventListener('DOMContentLoaded', function() {
+    const firstInput = document.querySelector('input[type="text"]');
+    if (firstInput) {
+      firstInput.focus();
+    }
+    
+    // Password strength indicator
+    const passwordInput = document.querySelector('input[name="password"]');
+    if (passwordInput) {
+      passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        const strength = getPasswordStrength(password);
+        // You can add password strength visualization here
+      });
+    }
+  });
+
+  function getPasswordStrength(password) {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    return strength;
+  }
+</script>
+{% endblock %}

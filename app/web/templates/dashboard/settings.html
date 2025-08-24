@@ -1,0 +1,333 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block page_title %}API Configuration{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('dashboard.home') }}">Home</a></li>
+<li class="breadcrumb-item active">Settings</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-gear me-1"></i>
+          Platform API Configuration
+        </h3>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('dashboard.settings') }}">
+          {{ form.hidden_tag() }}
+          
+          <!-- Twitter API Settings -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="border-bottom pb-2">
+                <i class="bi bi-twitter text-primary me-2"></i>
+                Twitter API Configuration
+              </h5>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                {{ form.twitter_api_key.label(class="form-label") }}
+                {% if form.twitter_api_key.errors %}
+                  {{ form.twitter_api_key(class="form-control is-invalid") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.twitter_api_key.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  {{ form.twitter_api_key(class="form-control") }}
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                {{ form.twitter_api_secret.label(class="form-label") }}
+                {% if form.twitter_api_secret.errors %}
+                  {{ form.twitter_api_secret(class="form-control is-invalid", type="password") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.twitter_api_secret.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  {{ form.twitter_api_secret(class="form-control", type="password") }}
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                {{ form.twitter_access_token.label(class="form-label") }}
+                {% if form.twitter_access_token.errors %}
+                  {{ form.twitter_access_token(class="form-control is-invalid") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.twitter_access_token.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  {{ form.twitter_access_token(class="form-control") }}
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                {{ form.twitter_access_token_secret.label(class="form-label") }}
+                {% if form.twitter_access_token_secret.errors %}
+                  {{ form.twitter_access_token_secret(class="form-control is-invalid", type="password") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.twitter_access_token_secret.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  {{ form.twitter_access_token_secret(class="form-control", type="password") }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Instagram API Settings -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="border-bottom pb-2">
+                <i class="bi bi-instagram text-danger me-2"></i>
+                Instagram API Configuration
+              </h5>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                {{ form.instagram_username.label(class="form-label") }}
+                {% if form.instagram_username.errors %}
+                  {{ form.instagram_username(class="form-control is-invalid") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.instagram_username.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  {{ form.instagram_username(class="form-control") }}
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                {{ form.instagram_password.label(class="form-label") }}
+                {% if form.instagram_password.errors %}
+                  {{ form.instagram_password(class="form-control is-invalid", type="password") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.instagram_password.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  {{ form.instagram_password(class="form-control", type="password") }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- TikTok API Settings -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="border-bottom pb-2">
+                <i class="bi bi-tiktok text-dark me-2"></i>
+                TikTok API Configuration
+              </h5>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group mb-3">
+                {{ form.tiktok_session_id.label(class="form-label") }}
+                {% if form.tiktok_session_id.errors %}
+                  {{ form.tiktok_session_id(class="form-control is-invalid") }}
+                  <div class="invalid-feedback">
+                    {% for error in form.tiktok_session_id.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  {{ form.tiktok_session_id(class="form-control") }}
+                {% endif %}
+                <div class="form-text">Session ID for TikTok API access</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="row">
+            <div class="col-12">
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="button" class="btn btn-outline-secondary me-md-2" onclick="testConnections()">
+                  <i class="bi bi-check-circle"></i> Test Connections
+                </button>
+                {{ form.submit(class="btn btn-primary") }}
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help & Instructions -->
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-info-circle me-1"></i>
+          Setup Instructions
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="accordion" id="setupAccordion">
+          
+          <!-- Twitter Setup -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="twitterHeading">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                      data-bs-target="#twitterCollapse" aria-expanded="false" aria-controls="twitterCollapse">
+                <i class="bi bi-twitter me-2"></i> Twitter Setup
+              </button>
+            </h2>
+            <div id="twitterCollapse" class="accordion-collapse collapse" aria-labelledby="twitterHeading" 
+                 data-bs-parent="#setupAccordion">
+              <div class="accordion-body">
+                <ol class="small">
+                  <li>Go to <a href="https://developer.twitter.com" target="_blank">Twitter Developer Portal</a></li>
+                  <li>Create a new app or use existing</li>
+                  <li>Generate API keys and tokens</li>
+                  <li>Copy the credentials to the form</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instagram Setup -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="instagramHeading">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                      data-bs-target="#instagramCollapse" aria-expanded="false" aria-controls="instagramCollapse">
+                <i class="bi bi-instagram me-2"></i> Instagram Setup
+              </button>
+            </h2>
+            <div id="instagramCollapse" class="accordion-collapse collapse" aria-labelledby="instagramHeading" 
+                 data-bs-parent="#setupAccordion">
+              <div class="accordion-body">
+                <ol class="small">
+                  <li>Use your Instagram account credentials</li>
+                  <li>Ensure 2FA is disabled or use app password</li>
+                  <li>Test with a secondary account first</li>
+                </ol>
+                <div class="alert alert-warning alert-sm mt-2">
+                  <i class="bi bi-exclamation-triangle me-1"></i>
+                  <small>Use responsibly and within Instagram's terms of service</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TikTok Setup -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="tiktokHeading">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                      data-bs-target="#tiktokCollapse" aria-expanded="false" aria-controls="tiktokCollapse">
+                <i class="bi bi-tiktok me-2"></i> TikTok Setup
+              </button>
+            </h2>
+            <div id="tiktokCollapse" class="accordion-collapse collapse" aria-labelledby="tiktokHeading" 
+                 data-bs-parent="#setupAccordion">
+              <div class="accordion-body">
+                <ol class="small">
+                  <li>Extract session ID from browser cookies</li>
+                  <li>Use browser developer tools</li>
+                  <li>Copy sessionid cookie value</li>
+                </ol>
+                <div class="alert alert-info alert-sm mt-2">
+                  <i class="bi bi-info-circle me-1"></i>
+                  <small>Session IDs expire regularly and need to be updated</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connection Status -->
+    <div class="card mt-3">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-wifi me-1"></i>
+          Connection Status
+        </h3>
+      </div>
+      <div class="card-body">
+        <div id="connectionStatus">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span>Twitter</span>
+            <span class="badge bg-secondary" id="twitterStatus">Not Configured</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span>Instagram</span>
+            <span class="badge bg-secondary" id="instagramStatus">Not Configured</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span>TikTok</span>
+            <span class="badge bg-secondary" id="tiktokStatus">Not Configured</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+  function testConnections() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="bi bi-hourglass-split"></i> Testing...';
+    button.disabled = true;
+    
+    // Reset status badges
+    document.getElementById('twitterStatus').textContent = 'Testing...';
+    document.getElementById('instagramStatus').textContent = 'Testing...';
+    document.getElementById('tiktokStatus').textContent = 'Testing...';
+    
+    // Here you would make actual API calls to test each platform
+    // For now, simulate the testing
+    setTimeout(() => {
+      // Simulate test results
+      updateStatusBadge('twitterStatus', Math.random() > 0.5);
+      updateStatusBadge('instagramStatus', Math.random() > 0.5);
+      updateStatusBadge('tiktokStatus', Math.random() > 0.5);
+      
+      button.innerHTML = originalText;
+      button.disabled = false;
+    }, 3000);
+  }
+  
+  function updateStatusBadge(elementId, isConnected) {
+    const badge = document.getElementById(elementId);
+    if (isConnected) {
+      badge.className = 'badge bg-success';
+      badge.textContent = 'Connected';
+    } else {
+      badge.className = 'badge bg-danger';
+      badge.textContent = 'Failed';
+    }
+  }
+  
+  // Check initial connection status on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    // You could make API calls here to check actual connection status
+  });
+</script>
+{% endblock %}
