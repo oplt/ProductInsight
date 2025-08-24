@@ -2,15 +2,13 @@
 
 {% block title %}Login{% endblock %}
 
-{% block content %}
-<div class="app-content">
-  <div class="container-fluid">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card card-outline card-primary">
+{% block auth_content %}
+<div class="card card-outline card-primary">
           <div class="card-header text-center">
-            <h3><b>Product</b>Insights</h3>
-            <p class="mb-1">Sign in to start your session</p>
+            <a href="{{ url_for('main.home') }}" class="link-dark text-center link-offset-2 link-opacity-100 link-opacity-50-hover">
+              <h1 class="mb-0"><b>Product</b>Insights</h1>
+            </a>
+            <p class="login-box-msg">Sign in to start your content analysis session</p>
           </div>
           <div class="card-body">
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -59,10 +57,6 @@
             </p>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock %}
 
 {% block additional_js %}

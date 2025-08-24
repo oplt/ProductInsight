@@ -39,7 +39,7 @@ def login():
         'submit': type('Field', (), {'label': {'text': 'Sign In'}})()
     })()
     
-    return render_template('auth/simple_login.html', title='Login')
+    return render_template('auth/simple_login.html', title='Login', form=form)
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -55,11 +55,11 @@ def register():
         # Check if user exists
         if User.query.filter_by(email=email).first():
             flash('Email already registered.', 'error')
-            return render_template('auth/register.html', title='Register')
+            return render_template('auth/simple_register.html', title='Register')
         
         if User.query.filter_by(username=username).first():
             flash('Username already taken.', 'error')
-            return render_template('auth/register.html', title='Register')
+            return render_template('auth/simple_register.html', title='Register')
         
         # Create new user
         user = User(username=username, email=email)
@@ -81,7 +81,7 @@ def register():
         'submit': type('Field', (), {'label': {'text': 'Sign Up'}})()
     })()
     
-    return render_template('auth/register.html', title='Register', form=form)
+    return render_template('auth/simple_register.html', title='Register')
 
 @auth_bp.route('/logout')
 @login_required

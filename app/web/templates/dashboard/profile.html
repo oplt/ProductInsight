@@ -94,7 +94,7 @@
         </h3>
       </div>
       <div class="card-body text-center">
-        <img src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}" 
+        <img src="{{ url_for('static', filename='profile_pics/' + (current_user.avatar_url or 'default.jpg')) }}" 
              class="rounded-circle mb-3" alt="Profile Picture" 
              style="width: 150px; height: 150px; object-fit: cover;">
         <p class="text-muted">Upload a new image to change your profile picture</p>
