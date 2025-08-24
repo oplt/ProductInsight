@@ -104,8 +104,7 @@
               <!--begin::User Menu Dropdown-->
               <li class="nav-item dropdown user-menu">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                  <img src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}" 
-                       class="user-image rounded-circle shadow" alt="User Image" />
+                    <img src="{{ current_user.avatar_url or url_for('static', filename='images/default-avatar.png') }}"
                   <span class="d-none d-md-inline">{{ current_user.username }}</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
